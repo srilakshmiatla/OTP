@@ -1,0 +1,20 @@
+def resend_otp(request):
+    email = request.session.get('email')
+    if email:
+        otp = random.randint(100000, 999999)
+        subject = 'Your Resent OTP Code'
+        message = f'Your new OTP code is {otp}'
+        from_email = 'youremail@gmail.com'
+        recipient_list = [email]
+
+        try:
+            send_mail(subject, message, from_email, recipient_list)
+            request.session['otp'] = str(otp)
+            messages.success(request, "New OTP sent to your email.")
+        except Exception as e:
+            messages.error(request, f"Failed to resend OTP: {e}")
+    else:
+        messages.error(request, "Session expired. Please login again.")
+        return redirect('login')
+    
+    return redirect('verify_otp')
